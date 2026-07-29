@@ -170,7 +170,10 @@
   footer .a{font-family:'Marcellus',Georgia,serif;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#9AA4AD}
   footer .b{font-size:12.5px;color:#7A848D}
 
-  #emailDlg{border:none;background:transparent;padding:0;max-width:min(92vw,470px)}
+  #emailDlg{border:none;background:transparent;padding:0;
+    position:fixed;inset:0;margin:auto;
+    width:fit-content;height:fit-content;
+    max-width:min(92vw,470px);max-height:90vh;overflow:auto}
   #emailDlg::backdrop{background:rgba(1,1,3,.82)}
   .edlg{background:#0D1117;border:1px solid rgba(255,255,255,.16);padding:clamp(22px,4vw,30px)}
   .ekick{display:inline-flex;align-items:center;gap:12px;font-family:'Marcellus',Georgia,serif;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:#4FC3FF}
@@ -179,6 +182,28 @@
   .eaddr{margin-top:16px;padding:14px 16px;background:#010103;border:1px solid rgba(255,255,255,.16);font-size:1.02rem;color:#F4F6F7;word-break:break-all;font-variant-ligatures:none}
   .emuted{margin-top:14px;font-size:.86rem;line-height:1.65;color:#9AA4AD}
   .ebtns{margin-top:22px;display:grid;gap:10px}
+  .cd{border-top:1px solid rgba(255,255,255,0.12);background:
+      linear-gradient(180deg,rgba(0,164,255,.07),rgba(0,164,255,0) 70%)}
+  .cd .wrap{padding-top:clamp(26px,3.4vw,40px);padding-bottom:clamp(26px,3.4vw,40px)}
+  .cdlab{display:inline-flex;align-items:center;gap:12px;font-family:'Marcellus',Georgia,serif;
+    font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#4FC3FF}
+  .cdlab span{width:9px;height:9px;background:#00A4FF;display:inline-block;
+    animation:cdpulse 2.4s ease-in-out infinite}
+  @keyframes cdpulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .cdrow{margin-top:16px;display:flex;align-items:flex-start;gap:clamp(10px,2vw,22px)}
+  .cdcell{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+  .cdcell b{font-weight:800;font-stretch:112%;font-size:clamp(2.4rem,6.4vw,4rem);line-height:.92;
+    letter-spacing:-.03em;color:#F4F6F7;font-variant-numeric:tabular-nums}
+  .cdcell.live b{color:#00A4FF}
+  .cdcell i{margin-top:9px;font-style:normal;font-family:'Marcellus',Georgia,serif;font-size:10px;
+    letter-spacing:.26em;text-transform:uppercase;color:#7A848D}
+  .cdsep{font-weight:800;font-size:clamp(1.6rem,4vw,2.6rem);line-height:1.05;color:#39424C}
+  .cd.over .cdrow{display:none}
+  @media (max-width:520px){
+    .cdrow{gap:8px}
+    .cdsep{display:none}
+    .cdcell i{font-size:9px;letter-spacing:.18em}
+  }
   .mobilebar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:60;background:rgba(1,1,3,.96);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.14);padding:13px clamp(16px,4vw,24px);padding-bottom:calc(13px + env(safe-area-inset-bottom));justify-content:space-between;align-items:center;gap:14px;cursor:pointer}
   .mobilebar .t{font-size:12.5px;color:#9AA4AD;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .mobilebar .t b{color:#F4F6F7;font-weight:700}
@@ -261,6 +286,21 @@
       </div>
     </div>
   </header>
+
+  <div class="cd hidden" id="cd">
+    <div class="wrap">
+      <p class="cdlab"><span></span><em id="cdWord">Doors open in</em></p>
+      <div class="cdrow">
+        <div class="cdcell"><b id="cdD">00</b><i>Days</i></div>
+        <div class="cdsep">:</div>
+        <div class="cdcell"><b id="cdH">00</b><i>Hours</i></div>
+        <div class="cdsep">:</div>
+        <div class="cdcell"><b id="cdM">00</b><i>Minutes</i></div>
+        <div class="cdsep">:</div>
+        <div class="cdcell live"><b id="cdS">00</b><i>Seconds</i></div>
+      </div>
+    </div>
+  </div>
 
   <main>
     <div class="wrap">
@@ -420,6 +460,7 @@ const MOCK_EVENT = {
   title:"Stand up for a better world.", venue:"Agama Cafe & Bar, GK, Delhi",
   mapsUrl:"https://www.google.com/maps/dir/?api=1&destination=M-18%2C%20Block%20M%2C%20Greater%20Kailash%20II%2C%20Greater%20Kailash%2C%20New%20Delhi%2C%20Delhi%20110048",
   dateLabel:"Saturday, 9 August", timeLabel:"4 to 6 PM", navTag:"Preview",
+  startsAt: Date.parse("2026-08-09T16:00:00+05:30"),
   seatPrice:399,
   rows:[{seats:3,price:399},{seats:3,price:399},{seats:3,price:399},
         {seats:6,price:399},{seats:6,price:399},
@@ -493,6 +534,8 @@ const el = {
   mobileBar: $("mobileBar"), mbText: $("mbText"), mbVal: $("mbVal"),
   shareBtn: $("shareBtn"), dirLink: $("dirLink"), shareOk: $("shareOk"),
   emailDlg: $("emailDlg"), emShow: $("emShow"),
+  cd: $("cd"), cdWord: $("cdWord"),
+  cdD: $("cdD"), cdH: $("cdH"), cdM: $("cdM"), cdS: $("cdS"),
   formPanel: $("formPanel"), payPanel: $("payPanel"), donePanel: $("donePanel"),
   timerPanel: $("timerPanel"), timerBox: $("timerBox"), clock: $("clock"),
   reserveBtn: $("reserveBtn"), payBtn: $("payBtn"), cancelBtn: $("cancelBtn"),
@@ -845,6 +888,46 @@ async function shareBooking() {
 }
 if ($("shareBtn")) $("shareBtn").addEventListener("click", shareBooking);
 
+/* Counts to the event's real start time. Silent if the event has no startsAt,
+   so an older event document simply shows nothing rather than 00:00:00. */
+let cdTick = null;
+function eventStartMs() {
+  const v = state.event && state.event.startsAt;
+  if (!v) return null;
+  if (typeof v.toMillis === "function") return v.toMillis();
+  if (typeof v === "number") return v;
+  const parsed = Date.parse(v);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+function paintCountdown() {
+  const at = eventStartMs();
+  if (!at) { el.cd.classList.add("hidden"); return; }
+  el.cd.classList.remove("hidden");
+
+  let left = at - Date.now();
+  if (left <= 0) {
+    el.cd.classList.add("over");
+    el.cdWord.textContent = "The show has started";
+    if (cdTick) { clearInterval(cdTick); cdTick = null; }
+    return;
+  }
+  el.cd.classList.remove("over");
+  const d = Math.floor(left / 86400000); left -= d * 86400000;
+  const h = Math.floor(left / 3600000);  left -= h * 3600000;
+  const m = Math.floor(left / 60000);    left -= m * 60000;
+  const sec = Math.floor(left / 1000);
+  const pad = (n) => String(n).padStart(2, "0");
+  el.cdD.textContent = pad(d);
+  el.cdH.textContent = pad(h);
+  el.cdM.textContent = pad(m);
+  el.cdS.textContent = pad(sec);
+  el.cdWord.textContent = d === 0 ? "Doors open today in" : "Doors open in";
+}
+function startCountdown() {
+  paintCountdown();
+  if (!cdTick && eventStartMs()) cdTick = setInterval(paintCountdown, 1000);
+}
+
 function startTimer() {
   stopTimer();
   const paint = () => {
@@ -905,6 +988,7 @@ async function onHoldExpired() {
 function watchEvent() {
   state.event = { ...MOCK_EVENT };
   renderFacts();
+  startCountdown();
   renderPhase();
 }
 
@@ -972,6 +1056,7 @@ el.reserveBtn.addEventListener("click", () => {
   const v = validateForm();
   if (!v.ok) { showHint(v.msg); return; }
 
+  showHint("");
   el.emShow.textContent = v.email;
   if (typeof el.emailDlg.showModal === "function") {
     el.emailDlg.showModal();

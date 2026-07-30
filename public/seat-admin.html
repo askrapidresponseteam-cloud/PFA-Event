@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seat desk · People for Animals</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&family=Marcellus&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;border-radius:0 !important}
+  body{background:#010103;color:#F4F6F7;font-family:'Archivo',system-ui,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  ::selection{background:#00A4FF;color:#0E1116}
+  input,select,button,textarea{font-family:'Archivo',system-ui,sans-serif}
+  input:focus,select:focus,textarea:focus{outline:2px solid #006DB3;outline-offset:2px}
+  input::placeholder{color:#5B6670}
+
+  .wrap{max-width:1400px;margin:0 auto;padding:0 clamp(16px,3vw,32px)}
+  .eyebrow{font-family:'Marcellus',Georgia,serif;font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:#7A848D}
+
+  nav{position:sticky;top:0;z-index:60;background:rgba(1,1,3,.94);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.12)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .brand{font-family:'Marcellus',Georgia,serif;font-weight:700;font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;white-space:nowrap}
+  .navright{display:flex;align-items:center;gap:14px;font-size:12px;color:#7A848D}
+  .dot{width:8px;height:8px;background:#1E7A5A;display:inline-block;margin-right:7px}
+  .dot.stale{background:#A66A00}
+
+  .in{border:1px solid rgba(255,255,255,.22);background:#12161C;color:#F4F6F7;padding:11px 12px;font-size:.92rem;width:100%}
+  .btn{background:#F4F6F7;color:#0E1116;border:none;padding:12px 18px;font-weight:700;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:background .18s}
+  .btn:hover:not(:disabled){background:#00A4FF}
+  .btn:disabled{background:#1A2029;color:#5B6670;cursor:not-allowed}
+  .btn.q{background:transparent;color:#9AA4AD;border:1px solid rgba(255,255,255,.22)}
+  .btn.q:hover:not(:disabled){border-color:#00A4FF;color:#F4F6F7;background:transparent}
+  .btn.sm{padding:8px 12px;font-size:10.5px}
+  .btn.bad{background:transparent;color:#FF7A70;border:1px solid rgba(255,122,112,.4)}
+  .btn.bad:hover:not(:disabled){background:#FF7A70;color:#0E1116}
+
+  /* gate */
+  #gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+  #gate .box{width:100%;max-width:380px;border:1px solid rgba(255,255,255,.12);padding:32px}
+  #gate h1{font-weight:800;font-stretch:112%;font-size:1.6rem;margin:14px 0 6px}
+  #gate p{color:#9AA4AD;font-size:.9rem}
+  #gate .form{display:grid;gap:11px;margin-top:22px}
+
+  /* kpis */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.12);margin:24px 0}
+  .kpi{background:#010103;padding:18px 20px}
+  .kpi b{display:block;font-weight:800;font-stretch:112%;font-size:1.75rem;font-variant-numeric:tabular-nums;line-height:1.1}
+  .kpi span{display:block;font-family:'Marcellus',Georgia,serif;font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:#7A848D;margin-top:7px}
+  .kpi.accent b{color:#00A4FF}
+  .kpi.warn b{color:#FF7A70}
+
+  .cols{display:grid;grid-template-columns:300px 1fr;gap:26px;align-items:start;padding-bottom:60px}
+  .card{border:1px solid rgba(255,255,255,.12)}
+  .card > header{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .card > .body{padding:18px}
+
+  /* seat map */
+  .mrows{display:grid;gap:6px}
+  .cfgrow{margin-top:10px}
+  .cfpair{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:stretch}
+  .cfpair .cfgrow{display:flex;flex-direction:column;justify-content:space-between}
+  .cfpair .cfgrow label{margin-bottom:5px}
+  .cfline{display:grid;grid-template-columns:26px 1fr 34px;gap:8px;align-items:center;margin-bottom:8px}
+  .cfline.tiered,.cfhead.tiered{grid-template-columns:26px 1fr 1fr 34px}
+  .cftier{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:11.5px;color:#9AA4AD;cursor:pointer}
+  .cftier input{width:14px;height:14px;accent-color:#00A4FF;cursor:pointer}
+  .cfline .rl{font-family:'Marcellus',Georgia,serif;font-size:13px;color:#7A848D;text-align:center}
+  .cfline .in{padding:9px 10px;font-size:13px}
+  .cfline .del{background:none;border:1px solid rgba(255,255,255,.16);color:#7A848D;height:34px;cursor:pointer;font-size:15px;line-height:1}
+  .cfline .del:hover{border-color:#FF7A70;color:#FF7A70}
+  .cfhead{display:grid;grid-template-columns:26px 1fr 34px;gap:8px;font-family:'Marcellus',Georgia,serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#7A848D;margin-bottom:8px}
+  .mrow{display:flex;gap:5px;align-items:center}
+  .mrow .lab{width:16px;font-family:'Marcellus',Georgia,serif;font-size:11px;color:#7A848D;flex:none}
+  .st{flex:1;height:30px;font-weight:700;font-size:10.5px;border:1px solid rgba(255,255,255,.2);background:#1A2029;color:#7A848D;cursor:pointer;position:relative}
+  .st.booked{background:#00A4FF;color:#0E1116;border-color:#0089D6}
+  .st.held{background:#0D1117;color:#00A4FF;border:1px dashed rgba(0,164,255,.6)}
+  .st.pick{outline:2px solid #F4F6F7;outline-offset:-2px}
+  .mlegend{margin-top:16px;display:grid;gap:7px;font-size:11.5px;color:#9AA4AD}
+  .mlegend i{width:12px;height:12px;display:inline-block;margin-right:8px;vertical-align:-1px;font-style:normal}
+
+  /* table */
+  .tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+  .tools .in{width:auto;flex:1;min-width:180px;padding:9px 11px}
+  select.in{color:#F4F6F7}
+  select.in option{background:#12161C}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{text-align:left;font-family:'Marcellus',Georgia,serif;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#7A848D;font-weight:400;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.1);white-space:nowrap;cursor:pointer;user-select:none}
+  th:hover{color:#F4F6F7}
+  td{padding:13px 14px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top}
+  tr.flag td{background:rgba(255,122,112,.07)}
+  .ref{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .who b{display:block;font-weight:700}
+  .who span{display:block;color:#7A848D;font-size:12px}
+  .sts{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:4px 8px;display:inline-block;white-space:nowrap}
+  .sts.paid{background:rgba(30,122,90,.2);color:#5FD3A6}
+  .sts.pending,.sts.holding{background:rgba(166,106,0,.2);color:#E0A44A}
+  .sts.expired,.sts.released,.sts.failed{background:rgba(138,147,155,.16);color:#8A939B}
+  .sts.paid_unfulfilled{background:rgba(179,38,30,.22);color:#FF7A70}
+  .tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#7A848D;border:1px solid rgba(255,255,255,.16);padding:2px 6px;margin-left:6px}
+  .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .empty{padding:44px 18px;text-align:center;color:#7A848D}
+
+  dialog{border:1px solid rgba(255,255,255,.15);background:#0A0D12;color:#F4F6F7;padding:0;max-width:460px;width:calc(100% - 32px)}
+  dialog::backdrop{background:rgba(1,1,3,.8)}
+  dialog .body{padding:22px;display:grid;gap:12px}
+  dialog h3{font-weight:800;font-stretch:112%;font-size:1.15rem}
+  label{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#7A848D;display:block;margin-bottom:5px}
+
+  .msg{padding:12px 16px;font-size:.88rem;border-left:3px solid #00A4FF;background:#12161C;margin-bottom:16px}
+  .msg.bad{border-left-color:#FF7A70}
+  .hidden{display:none !important}
+  .muted{color:#7A848D}
+
+  @media(max-width:1000px){
+    .cols{grid-template-columns:1fr}
+    thead{display:none}
+    tr{display:block;border-bottom:1px solid rgba(255,255,255,.12);padding:6px 0}
+    td{display:flex;justify-content:space-between;gap:14px;border:none;padding:7px 14px}
+    td::before{content:attr(data-l);font-family:'Marcellus',Georgia,serif;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#7A848D;flex:none}
+    /* the desk gets used on a phone at the door: thumb sized targets */
+    .st{height:42px;font-size:11px}
+    .mrow{gap:6px}
+    .in,select.in{font-size:16px}
+    dialog{width:min(94vw,560px);max-width:94vw}
+    .tools .in{min-width:140px}
+  }
+  @media(max-width:640px){
+    html,body{overflow-x:clip}
+    nav .wrap{height:auto;min-height:56px;padding-top:10px;padding-bottom:10px;flex-wrap:wrap;row-gap:6px}
+    .brand{font-size:11px;letter-spacing:.18em}
+    .navright{gap:10px}
+    #whoami{display:none}
+    .kpi{padding:14px 16px}
+    .kpi b{font-size:1.45rem}
+    .card > header{padding:14px}
+    .card > .body{padding:14px}
+    .tools{padding:12px 14px}
+    td{padding:8px 6px}
+  }
+</style>
+</head>
+<body>
+
+<!-- sign in -->
+<div id="gate">
+  <div class="box">
+    <p class="eyebrow">People for Animals</p>
+    <h1>Seat desk</h1>
+    <p>Organiser access only.</p>
+    <div class="form">
+      <input class="in" id="gEmail" type="email" placeholder="Email" autocomplete="username">
+      <input class="in" id="gPass" type="password" placeholder="Password" autocomplete="current-password">
+      <button class="btn" id="gBtn">Sign in</button>
+      <p class="msg bad hidden" id="gErr"></p>
+    </div>
+  </div>
+</div>
+
+<!-- console -->
+<div id="app" class="hidden">
+  <nav>
+    <div class="wrap">
+      <div class="brand">People for Animals · Seat desk</div>
+      <div class="navright">
+        <span id="live"><span class="dot"></span><span id="liveTxt">live</span></span>
+        <span id="whoami" class="muted"></span>
+        <button class="btn q sm" id="signOut">Sign out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <div class="msg hidden" id="note"></div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div class="cols">
+
+      <!-- seat map -->
+      <div class="card">
+        <header>
+          <span class="eyebrow">Live map</span>
+          <span class="muted" id="mapCount" style="font-size:11.5px"></span>
+        </header>
+        <div class="body">
+          <div class="mrows" id="mrows"></div>
+          <div class="mlegend">
+            <div><i style="background:#00A4FF"></i>Sold</div>
+            <div><i style="background:#0D1117;border:1px dashed rgba(0,164,255,.6)"></i>On hold right now</div>
+            <div><i style="background:#1A2029;border:1px solid rgba(255,255,255,.2)"></i>Available</div>
+          </div>
+          <p class="muted" style="font-size:11.5px;margin-top:14px">Tap free seats to select them, then use Add offline booking.</p>
+        </div>
+        <header style="border-top:1px solid rgba(255,255,255,.1);border-bottom:none">
+          <span class="eyebrow">Sales</span>
+          <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn q sm" id="cfgBtn">Event setup</button>
+          <select class="in" id="evStatus" style="width:auto;padding:7px 10px;font-size:12px">
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
+            <option value="soldout">Sold out</option>
+          </select>
+          </div>
+        </header>
+      </div>
+
+      <!-- bookings -->
+      <div class="card">
+        <header>
+          <span class="eyebrow">Bookings</span>
+          <div style="display:flex;gap:8px">
+            <button class="btn q sm" id="addBtn">Add offline booking</button>
+            <button class="btn q sm" id="csvBtn">Export CSV</button>
+          </div>
+        </header>
+        <div class="tools">
+          <input class="in" id="q" type="search" placeholder="Search name, email, phone, seat or reference">
+          <select class="in" id="filter" style="width:auto;flex:none">
+            <option value="all">All bookings</option>
+            <option value="paid">Booked</option>
+            <option value="open">In progress</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th data-s="reference">Ref</th>
+              <th data-s="name">Who</th>
+              <th data-s="seats">Seats</th>
+              <th data-s="amount">Amount</th>
+              <th data-s="createdAt">Booked at</th>
+              <th data-s="status">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div class="empty hidden" id="empty">No bookings yet.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- offline booking -->
+<dialog id="cfgDlg">
+  <div class="body">
+    <h3>Event setup</h3>
+    <p class="muted" style="font-size:.85rem">The room and the prices. Change these and the booking page follows immediately, with no code change and no redeploy.</p>
+
+    <div class="cfgrow"><label for="cTitle">Show title</label><input class="in" id="cTitle"></div>
+    <div class="cfgrow"><label for="cVenue">Venue</label><input class="in" id="cVenue"></div>
+    <div class="cfpair">
+      <div class="cfgrow"><label for="cDate">Date shown</label><input class="in" id="cDate" placeholder="Sunday 9 August"></div>
+      <div class="cfgrow"><label for="cTime">Time shown</label><input class="in" id="cTime" placeholder="4 to 6 PM"></div>
+    </div>
+    <div class="cfgrow"><label for="cMaps">Directions link (optional)</label><input class="in" id="cMaps" placeholder="https://www.google.com/maps/..."></div>
+    <div class="cfgrow"><label for="cStarts">Actual start (drives the countdown and the reminder emails)</label><input class="in" id="cStarts" type="datetime-local"></div>
+    <div class="cfpair">
+      <div class="cfgrow"><label for="cPrice">Price per seat</label><input class="in" id="cPrice" type="number" min="1" step="1"></div>
+      <div class="cfgrow"><label for="cMax">Most seats one person may book</label><input class="in" id="cMax" type="number" min="1" max="20"></div>
+    </div>
+
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="eyebrow">The room, front to back</span>
+        <span class="muted" style="font-size:11.5px" id="cSummary"></span>
+      </div>
+      <p class="muted" style="font-size:11.5px;margin:8px 0 10px">Row A is nearest the mic. Seats already sold or on hold cannot be removed.</p>
+      <label class="cftier"><input type="checkbox" id="cTier"><span>Charge different prices by row</span></label>
+      <div id="cRows"></div>
+      <button class="btn q sm" id="cAddRow" style="margin-top:10px">Add a row</button>
+    </div>
+
+    <p class="msg bad hidden" id="cErr"></p>
+    <p class="msg ok hidden" id="cOk"></p>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn" id="cSave" style="flex:1">Save setup</button>
+      <button class="btn q" id="cCancel">Close</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="dlg">
+  <div class="body">
+    <h3>Offline booking</h3>
+    <p class="muted" style="font-size:.85rem">Cash at the door, a sponsor's seats, or a comp. The seats lock immediately and a ticket email goes out if you add an address.</p>
+    <div><label for="oSeats">Seats</label><input class="in" id="oSeats" placeholder="A1, A2"></div>
+    <div><label for="oName">Name</label><input class="in" id="oName" placeholder="Full name"></div>
+    <div><label for="oEmail">Email (optional)</label><input class="in" id="oEmail" type="email" placeholder="For the ticket"></div>
+    <div><label for="oPhone">Phone (optional)</label><input class="in" id="oPhone" placeholder="10 digits"></div>
+    <div><label for="oMethod">Taken as</label>
+      <select class="in" id="oMethod">
+        <option value="cash">Cash</option><option value="upi">UPI</option>
+        <option value="bank">Bank transfer</option><option value="sponsor">Sponsor</option>
+        <option value="comp">Complimentary (no charge)</option>
+      </select></div>
+    <div><label for="oNote">Note (optional)</label><input class="in" id="oNote" placeholder="Who took it, any context"></div>
+    <p class="msg bad hidden" id="oErr"></p>
+    <div style="display:flex;gap:10px;margin-top:6px">
+      <button class="btn" id="oSave" style="flex:1">Book seats</button>
+      <button class="btn q" id="oCancel">Cancel</button>
+    </div>
+  </div>
+</dialog>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+import { getFirestore, doc, collection, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+import { getFunctions, httpsCallable }
+  from "https://www.gstatic.com/firebasejs/10.13.2/firebase-functions.js";
+
+/* Same values as seat-booking.html */
+/* Project pfa-events. Run scripts/setup.sh and these values are filled in for
+   you from the registered web app. To do it by hand instead, copy the config
+   object from Project settings, Your apps in the Firebase console. */
+const FIREBASE_CONFIG = {
+  apiKey:            "REPLACE_ME",
+  authDomain:        "pfa-events.firebaseapp.com",
+  projectId:         "pfa-events",
+  storageBucket:     "REPLACE_ME",   // console shows .appspot.com or .firebasestorage.app
+  messagingSenderId: "751693085778",
+  appId:             "REPLACE_ME"
+};
+const EVENT_ID = "pfa-standup-2026-08-09";
+const FUNCTIONS_REGION = "asia-south1";
+const REFRESH_MS = 15000;
+
+const app = initializeApp(FIREBASE_CONFIG);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const fns = getFunctions(app, FUNCTIONS_REGION);
+
+const call = (n) => httpsCallable(fns, n);
+const api = {
+  list: call("adminListBookings"), offline: call("adminOfflineBooking"),
+  status: call("adminSetEventStatus"), saveConfig: call("adminSaveEventConfig")
+};
+
+const $ = (id) => document.getElementById(id);
+const S = { event: null, seats: new Map(), bookings: [], pick: new Set(), sort: "createdAt", dir: -1, timer: null };
+
+const inr = (n) => "\u20B9" + Number(n || 0).toLocaleString("en-IN");
+const seatSort = (a, b) => a.localeCompare(b, undefined, { numeric: true });
+const when = (ms) => ms ? new Date(ms).toLocaleString("en-IN", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit", hour12:true }) : "";
+
+function note(msg, bad) {
+  const n = $("note");
+  if (!msg) { n.classList.add("hidden"); return; }
+  n.textContent = msg;
+  n.className = "msg" + (bad ? " bad" : "");
+  setTimeout(() => n.classList.add("hidden"), 6000);
+}
+
+/* ---------- auth ---------- */
+$("gBtn").addEventListener("click", async () => {
+  $("gErr").classList.add("hidden");
+  $("gBtn").disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, $("gEmail").value.trim(), $("gPass").value);
+  } catch (e) {
+    $("gErr").textContent = "Could not sign in. Check the email and password.";
+    $("gErr").classList.remove("hidden");
+  }
+  $("gBtn").disabled = false;
+});
+$("gPass").addEventListener("keydown", (e) => { if (e.key === "Enter") $("gBtn").click(); });
+$("signOut").addEventListener("click", () => signOut(auth));
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    $("gate").classList.remove("hidden"); $("app").classList.add("hidden");
+    if (S.timer) clearInterval(S.timer);
+    return;
+  }
+  const token = await user.getIdTokenResult(true);
+  if (token.claims.admin !== true) {
+    $("gErr").textContent = "That account does not have organiser access yet.";
+    $("gErr").classList.remove("hidden");
+    await signOut(auth);
+    return;
+  }
+  $("whoami").textContent = user.email;
+  $("gate").classList.add("hidden"); $("app").classList.remove("hidden");
+  watch();
+  await refresh();
+  S.timer = setInterval(refresh, REFRESH_MS);
+});
+
+/* ---------- live data ---------- */
+function watch() {
+  onSnapshot(doc(db, "events", EVENT_ID), (s) => {
+    if (!s.exists()) return;
+    S.event = s.data();
+    $("evStatus").value = S.event.status || "open";
+    render();
+  });
+  onSnapshot(collection(db, "events", EVENT_ID, "seats"), (snap) => {
+    snap.docChanges().forEach((c) => S.seats.set(c.doc.id, c.doc.data()));
+    render();
+  });
+}
+
+async function refresh() {
+  try {
+    const r = await api.list({ eventId: EVENT_ID });
+    S.bookings = r.data.bookings || [];
+    $("live").querySelector(".dot").classList.remove("stale");
+    $("liveTxt").textContent = "live";
+    render();
+  } catch (e) {
+    $("live").querySelector(".dot").classList.add("stale");
+    $("liveTxt").textContent = "reconnecting";
+  }
+}
+
+/* ---------- render ---------- */
+function render() { renderKpis(); renderMap(); renderTable(); }
+
+function renderKpis() {
+  const all = [...S.seats.values()];
+  const now = Date.now();
+  const sold = all.filter((s) => s.status === "booked").length;
+  const held = all.filter((s) => s.status === "held" && s.holdExpiresAt?.toMillis() > now).length;
+  const free = all.length - sold - held;
+
+  const paid = S.bookings.filter((b) => b.status === "paid");
+  const money = paid.reduce((t, b) => t + Number(b.amount || 0), 0);
+
+  // Four numbers. Nothing else earns a place on the strip.
+  $("kpis").innerHTML = [
+    ["accent", sold + " / " + all.length, "Seats sold"],
+    ["", free, "Available"],
+    ["", held, "On hold"],
+    ["accent", inr(money), "Collected"],
+  ].filter(Boolean).map(([c, v, l]) =>
+    `<div class="kpi ${c}"><b>${v}</b><span>${l}</span></div>`).join("");
+}
+
+function renderMap() {
+  if (!S.event) return;
+  const now = Date.now();
+  const byBooking = new Map();
+  S.bookings.forEach((b) => b.seats.forEach((s) => byBooking.set(s, b)));
+
+  const plan = cfgPlan(S.event);
+
+  let html = "";
+  for (let r = 0; r < plan.length; r++) {
+    const rn = String.fromCharCode(65 + r);
+    html += `<div class="mrow"><span class="lab">${rn}</span>`;
+    for (let i = 1; i <= plan[r].seats; i++) {
+      const id = rn + i;
+      const s = S.seats.get(id) || {};
+      const live = s.status === "held" && s.holdExpiresAt?.toMillis() > now;
+      const cls = s.status === "booked" ? "booked" : live ? "held" : "";
+      const owner = byBooking.get(id);
+      const title = owner ? `${id} \u00B7 ${owner.name || owner.reference}`
+        : live ? id + " on hold" : id + " available";
+      html += `<button class="st ${cls} ${S.pick.has(id) ? "pick" : ""}" data-seat="${id}" title="${title}">${i}</button>`;
+    }
+    html += `</div>`;
+  }
+  $("mrows").innerHTML = html;
+  $("mapCount").textContent = S.pick.size ? S.pick.size + " selected" : "";
+}
+
+function visible() {
+  const q = $("q").value.trim().toLowerCase();
+  const f = $("filter").value;
+  let rows = S.bookings.slice();
+
+  if (f === "paid") rows = rows.filter((b) => b.status === "paid");
+  else if (f === "open") rows = rows.filter((b) => b.status === "pending" || b.status === "holding");
+
+  if (q) rows = rows.filter((b) =>
+    [b.reference, b.name, b.email, b.phone, b.seats.join(" "), b.note].join(" ").toLowerCase().includes(q));
+
+  const k = S.sort;
+  rows.sort((a, b) => {
+    let x = a[k], y = b[k];
+    if (k === "seats") { x = a.seats[0] || ""; y = b.seats[0] || ""; return seatSort(x, y) * S.dir; }
+    if (typeof x === "string" || typeof y === "string") return String(x || "").localeCompare(String(y || "")) * S.dir;
+    return ((x || 0) - (y || 0)) * S.dir;
+  });
+  return rows;
+}
+
+function renderTable() {
+  const rows = visible();
+  $("empty").classList.toggle("hidden", rows.length > 0);
+  $("tbody").innerHTML = rows.map((b) => {
+    const cls = b.status === "paid_unfulfilled" ? "flag" : "";
+    return `<tr class="${cls}">
+      <td data-l="Ref" class="ref">${b.reference}${b.source === "offline" ? '<span class="tag">Offline</span>' : ""}</td>
+      <td data-l="Who" class="who"><b>${esc(b.name) || '<span class="muted">Not captured</span>'}</b>
+        <span>${esc(b.email) || ""}</span><span>${esc(b.phone) || ""}</span>
+        ${b.note ? `<span>${esc(b.note)}</span>` : ""}</td>
+      <td data-l="Seats" class="num">${b.seats.slice().sort(seatSort).join(", ")}<br><span class="muted">${b.seatCount} seat${b.seatCount > 1 ? "s" : ""}</span></td>
+      <td data-l="Amount" class="num">${inr(b.amount)}${b.method ? `<br><span class="muted">${b.method}</span>` : ""}</td>
+      <td data-l="Booked at" class="num muted">${when(b.paidAt || b.createdAt)}</td>
+      <td data-l="Status"><span class="sts ${b.status}">${label(b.status)}</span>
+        ${b.status === "paid_unfulfilled" ? '<br><span class="muted" style="font-size:11px">Paid after the seats had gone</span>' : ""}</td>
+    </tr>`;
+  }).join("");
+}
+
+/* Four things a booking can be, in words anyone can read. */
+const LABEL = {
+  paid:"Booked", holding:"In progress", pending:"In progress",
+  failed:"Released", expired:"Released", released:"Released",
+  paid_unfulfilled:"Not seated", unreadable:"Error"
+};
+const label = (s) => LABEL[s] || s.replace(/_/g, " ");
+
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+/* ---------- actions ---------- */
+$("q").addEventListener("input", renderTable);
+$("filter").addEventListener("change", renderTable);
+document.querySelectorAll("th[data-s]").forEach((th) => th.addEventListener("click", () => {
+  const k = th.dataset.s;
+  S.dir = S.sort === k ? -S.dir : -1;
+  S.sort = k; renderTable();
+}));
+
+$("mrows").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-seat]"); if (!b) return;
+  const id = b.dataset.seat;
+  if ((S.seats.get(id) || {}).status !== "available") return;
+  S.pick.has(id) ? S.pick.delete(id) : S.pick.add(id);
+  renderMap();
+});
+
+
+
+$("evStatus").addEventListener("change", async (e) => {
+  try {
+    await api.status({ eventId: EVENT_ID, status: e.target.value });
+    note("Sales set to " + e.target.value + ".");
+  } catch (err) { note(err.message, true); }
+});
+
+/* offline booking */
+$("addBtn").addEventListener("click", () => {
+  $("oSeats").value = [...S.pick].sort(seatSort).join(", ");
+  $("oErr").classList.add("hidden");
+  $("dlg").showModal();
+});
+$("oCancel").addEventListener("click", () => $("dlg").close());
+$("oSave").addEventListener("click", async () => {
+  const seatList = $("oSeats").value.split(/[,\s]+/).map((s) => s.trim().toUpperCase()).filter(Boolean);
+  $("oErr").classList.add("hidden");
+  $("oSave").disabled = true;
+  try {
+    const r = await api.offline({
+      eventId: EVENT_ID, seats: seatList,
+      name: $("oName").value, email: $("oEmail").value, phone: $("oPhone").value,
+      method: $("oMethod").value, note: $("oNote").value
+    });
+    $("dlg").close();
+    S.pick.clear();
+    ["oSeats","oName","oEmail","oPhone","oNote"].forEach((id) => $(id).value = "");
+    note(`Booked ${r.data.seats.join(", ")} as ${r.data.reference}.` + (r.data.emailed ? " Ticket emailed." : " No email given, so no ticket sent."));
+    await refresh();
+  } catch (err) {
+    $("oErr").textContent = err.message;
+    $("oErr").classList.remove("hidden");
+  }
+  $("oSave").disabled = false;
+});
+
+/* export */
+$("csvBtn").addEventListener("click", () => {
+  const rows = visible();
+  const head = ["Reference","Name","Email","Phone","Seats","Count","Amount","Status","Source","Booked at","Note"];
+  const cell = (v) => { const s = String(v ?? ""); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const csv = [head.join(",")].concat(rows.map((b) => [
+    b.reference, b.name, b.email, b.phone, b.seats.slice().sort(seatSort).join(" "),
+    b.seatCount, b.amount, b.status, b.source, when(b.paidAt || b.createdAt), b.note
+  ].map(cell).join(","))).join("\n");
+
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "pfa-bookings-" + new Date().toISOString().slice(0, 10) + ".csv";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+/* ---------------------------------------------------------------------------
+   Event setup: the room and the prices, editable without a developer.
+   --------------------------------------------------------------------------- */
+let cfgRows = [];
+
+function cfgPlan(e) {
+  const base = Number(e && e.seatPrice) || 0;
+  if (Array.isArray(e && e.rows) && e.rows.length) {
+    return e.rows.map((r) => typeof r === "number"
+      ? { seats: r, price: base }
+      : { seats: Number(r.seats) || 0, price: Number(r.price != null ? r.price : base) || 0 });
+  }
+  return Array.from({ length: (e && e.rowCount) || 0 },
+    () => ({ seats: (e && e.seatsPerRow) || 0, price: base }));
+}
+
+/* One price for the whole room unless the organiser opts into per row
+   pricing. Seven identical price boxes is seven chances to mistype one. */
+let cfgTiered = false;
+
+function cfgRender() {
+  const t = cfgTiered ? " tiered" : "";
+  const head = '<div class="cfhead' + t + '"><span></span><span>Seats</span>' +
+    (cfgTiered ? '<span>Price each</span>' : '') + '<span></span></div>';
+  $("cRows").innerHTML = head + cfgRows.map((r, i) => {
+    const label = String.fromCharCode(65 + i);
+    return '<div class="cfline' + t + '">' +
+      '<span class="rl">' + label + '</span>' +
+      '<input class="in" type="number" min="1" max="40" data-k="seats" data-i="' + i + '" value="' + r.seats + '">' +
+      (cfgTiered
+        ? '<input class="in" type="number" min="1" step="1" data-k="price" data-i="' + i + '" value="' + r.price + '">'
+        : '') +
+      '<button class="del" data-del="' + i + '" title="Remove row ' + label + '">&times;</button>' +
+      '</div>';
+  }).join("");
+  cfgSummary();
+}
+
+function cfgSummary() {
+  const flat = Number($("cPrice").value) || 0;
+  const seats = cfgRows.reduce((t, r) => t + (Number(r.seats) || 0), 0);
+  const gross = cfgTiered
+    ? cfgRows.reduce((t, r) => t + (Number(r.seats) || 0) * (Number(r.price) || 0), 0)
+    : seats * flat;
+  $("cSummary").textContent = seats + (seats === 1 ? " seat" : " seats") + " · full house " + inr(gross);
+}
+
+/* Every row carries a price when it reaches the server; a flat room just
+   means they all carry the same one. */
+function cfgPriced() {
+  const flat = Number($("cPrice").value) || 0;
+  return cfgRows.map((r) => ({
+    seats: Number(r.seats),
+    price: cfgTiered ? Number(r.price) : flat
+  }));
+}
+
+function cfgOpen() {
+  const e = S.event || {};
+  cfgRows = cfgPlan(e).map((r) => ({ ...r }));
+  if (!cfgRows.length) cfgRows = [{ seats: 7, price: 399 }];
+  const prices = [...new Set(cfgRows.map((r) => r.price))];
+  cfgTiered = prices.length > 1;
+  $("cTier").checked = cfgTiered;
+  $("cPrice").value = prices[0] || 399;
+  $("cTitle").value = e.title || "";
+  $("cVenue").value = e.venue || "";
+  $("cDate").value  = e.dateLabel || "";
+  $("cTime").value  = e.timeLabel || "";
+  $("cMaps").value  = e.mapsUrl || "";
+  $("cMax").value   = e.maxPerBooking || 10;
+  // datetime-local wants local wall time with no zone, so render the stored
+  // moment in India rather than handing it a UTC string.
+  const st = e.startsAt && typeof e.startsAt.toMillis === "function" ? e.startsAt.toMillis()
+           : (typeof e.startsAt === "number" ? e.startsAt : Date.parse(e.startsAt || ""));
+  $("cStarts").value = Number.isFinite(st)
+    ? new Date(st + 5.5 * 3600 * 1000).toISOString().slice(0, 16)
+    : "";
+  $("cErr").classList.add("hidden");
+  $("cOk").classList.add("hidden");
+  cfgRender();
+  $("cfgDlg").showModal();
+}
+
+$("cRows").addEventListener("input", (ev) => {
+  const t = ev.target.closest("input[data-k]");
+  if (!t) return;
+  cfgRows[Number(t.dataset.i)][t.dataset.k] = Number(t.value);
+  cfgSummary();
+});
+
+$("cPrice").addEventListener("input", () => {
+  // A flat room keeps every row in step with the single price.
+  if (!cfgTiered) cfgRows.forEach((r) => { r.price = Number($("cPrice").value); });
+  cfgSummary();
+});
+
+$("cTier").addEventListener("change", (ev) => {
+  cfgTiered = ev.target.checked;
+  if (!cfgTiered) {
+    // Collapsing back to one price: the single field wins, so nothing is
+    // left behind on a row where it cannot be seen.
+    const flat = Number($("cPrice").value) || 0;
+    cfgRows.forEach((r) => { r.price = flat; });
+  }
+  cfgRender();
+});
+
+$("cRows").addEventListener("click", (ev) => {
+  const b = ev.target.closest("button[data-del]");
+  if (!b) return;
+  if (cfgRows.length === 1) return;
+  cfgRows.splice(Number(b.dataset.del), 1);
+  cfgRender();
+});
+
+$("cAddRow").addEventListener("click", () => {
+  if (cfgRows.length >= 26) return;
+  const last = cfgRows[cfgRows.length - 1] || { seats: 7, price: 399 };
+  cfgRows.push({
+    seats: last.seats,
+    price: cfgTiered ? last.price : (Number($("cPrice").value) || last.price)
+  });
+  cfgRender();
+});
+
+$("cfgBtn").addEventListener("click", cfgOpen);
+$("cCancel").addEventListener("click", () => $("cfgDlg").close());
+
+$("cSave").addEventListener("click", async () => {
+  const btn = $("cSave");
+  $("cErr").classList.add("hidden"); $("cOk").classList.add("hidden");
+  btn.disabled = true; btn.textContent = "Saving...";
+  try {
+    const res = await api.saveConfig({
+      eventId: EVENT_ID,
+      title: $("cTitle").value, venue: $("cVenue").value,
+      dateLabel: $("cDate").value, timeLabel: $("cTime").value,
+      mapsUrl: $("cMaps").value.trim(),
+      startsAt: $("cStarts").value,
+      maxPerBooking: Number($("cMax").value),
+      rows: cfgPriced()
+    });
+    const d = res.data || res;
+    $("cOk").textContent = "Saved. " + d.capacity + (d.capacity === 1 ? " seat" : " seats") +
+      (d.added ? ", " + d.added + " added" : "") +
+      (d.removed ? ", " + d.removed + " removed" : "") + ".";
+    $("cOk").classList.remove("hidden");
+  } catch (err) {
+    $("cErr").textContent = (err && err.message) || "Could not save.";
+    $("cErr").classList.remove("hidden");
+  } finally {
+    btn.disabled = false; btn.textContent = "Save setup";
+  }
+});
+
+</script>
+</body>
+</html>

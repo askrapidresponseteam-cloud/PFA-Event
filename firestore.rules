@@ -1,0 +1,50 @@
+rules_version = '2';
+
+// Everything that changes seat state runs through Cloud Functions with the
+// Admin SDK, which bypasses these rules. The browser only ever reads.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Organisers carry a custom claim, granted by scripts/grant-admin.js.
+    function isOrganiser() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    // Event details are public.
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if false;
+
+      // Seat states are public so the map can update live.
+      match /seats/{seatId} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+
+    // A booking is readable only by the session that created it, and never
+    // listable. Personal details live in the private subcollection, which no
+    // client can touch at all.
+    match /bookings/{bookingId} {
+      allow get: if isOrganiser()
+                 || (request.auth != null && resource.data.uid == request.auth.uid);
+      allow list: if isOrganiser();
+      allow create, update, delete: if false;
+
+      // Personal details stay server side even for organisers, who read them
+      // through adminListBookings so every access goes through a function.
+      match /private/{docId} {
+        allow read, write: if false;
+      }
+    }
+
+    // Raw gateway callbacks. Server only.
+    match /webhookEvents/{eventId} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

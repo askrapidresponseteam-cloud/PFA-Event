@@ -42,25 +42,45 @@
   nav .wrap{min-height:82px;display:flex;align-items:center;justify-content:space-between;gap:16px}
   .brand{display:flex;align-items:center;gap:14px;font-family:'Marcellus',Georgia,serif;font-weight:700;font-size:13px;letter-spacing:.22em;text-transform:uppercase;white-space:nowrap;-webkit-text-stroke:.4px currentColor}
   .brand .logo{height:52px;width:auto;flex:none;display:block}
-  /* The animated brand mark, scaled down from the logo studio treatment so
-     the nav stays calm: a slow float, a glow that breathes, and a shine that
-     sweeps across once a cycle. The sweep is masked to the logo's own pixels
-     so the streak never crosses the transparent parts of the PNG. */
+  /* The animated brand mark, in the Lamborghini treatment from the logo
+     studio: the mark arrives almost black, catches a gold light that flares
+     and settles, then keeps a slow breath with a gold rim sweep passing
+     across it. The sweep is masked to the logo's own pixels so the streak
+     rides the artwork and never crosses the transparent parts of the PNG. */
+  .brand{perspective:520px}
   .brand .mark{position:relative;flex:none;display:inline-block;
-    animation:brandFloat 7s ease-in-out infinite,brandGlow 7s ease-in-out infinite}
+    animation:lamReveal 3.4s cubic-bezier(.2,.8,.2,1) both,
+      lamIdle 6s ease-in-out 3.4s infinite}
   .brand .mark .shine{position:absolute;inset:0;overflow:hidden;pointer-events:none;
     -webkit-mask-image:url(media/pfa-logo.png);mask-image:url(media/pfa-logo.png);
     -webkit-mask-size:contain;mask-size:contain;
     -webkit-mask-position:center;mask-position:center;
     -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
-  .brand .mark .shine i{position:absolute;top:-20%;bottom:-20%;left:-130%;width:60%;
-    background:linear-gradient(to right,rgba(255,255,255,0) 0%,rgba(255,255,255,.5) 50%,rgba(255,255,255,0) 100%);
-    transform:skewX(-20deg);animation:brandSweep 7s ease-in-out infinite}
-  @keyframes brandFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.04)}}
-  @keyframes brandGlow{0%,100%{filter:drop-shadow(0 0 0 rgba(0,164,255,0))}
-    50%{filter:drop-shadow(0 0 9px rgba(0,164,255,.55))}}
-  @keyframes brandSweep{0%,52%{left:-130%}72%,100%{left:200%}}
+  .brand .mark .shine i{position:absolute;top:-50%;bottom:-50%;left:-150%;width:80%;
+    mix-blend-mode:screen;transform:skewX(-35deg);
+    background:linear-gradient(to right,rgba(255,215,0,0) 0%,rgba(255,215,0,.12) 30%,
+      rgba(255,255,200,.95) 50%,rgba(255,215,0,.12) 70%,rgba(255,215,0,0) 100%);
+    animation:lamSweep 6s cubic-bezier(.4,0,.2,1) 1.1s infinite}
+  @keyframes lamReveal{
+    0%{transform:scale(1.06) translateY(4px) rotateX(12deg);
+      filter:brightness(.2) contrast(1.5) drop-shadow(0 0 0 rgba(255,215,0,0))}
+    15%{filter:brightness(.45) contrast(1.5) drop-shadow(0 0 4px rgba(255,215,0,.35))}
+    32%{transform:scale(1) translateY(0) rotateX(0deg);
+      filter:brightness(1.25) contrast(1.2) drop-shadow(0 0 16px rgba(255,215,0,.85))}
+    46%{filter:brightness(1.5) contrast(1.3) drop-shadow(0 0 22px rgba(255,235,100,1))}
+    70%{transform:scale(.98) translateY(-2px) rotateX(-5deg);
+      filter:brightness(1.05) contrast(1.1) drop-shadow(0 6px 12px rgba(255,215,0,.4))}
+    100%{transform:scale(1) translateY(0) rotateX(0deg);
+      filter:brightness(1) contrast(1) drop-shadow(0 2px 6px rgba(0,0,0,.8))}
+  }
+  @keyframes lamIdle{
+    0%,100%{transform:translateY(0) scale(1);filter:brightness(1) drop-shadow(0 2px 6px rgba(0,0,0,.8))}
+    50%{transform:translateY(-2px) scale(1.04);filter:brightness(1.12) drop-shadow(0 0 12px rgba(255,215,0,.55))}
+  }
+  @keyframes lamSweep{0%{left:-150%;opacity:0}8%{opacity:0}
+    16%{left:-100%;opacity:1}44%{left:200%;opacity:1}52%,100%{left:250%;opacity:0}}
   @media (prefers-reduced-motion:reduce){
+    .brand{perspective:none}
     .brand .mark{animation:none}
     .brand .mark .shine{display:none}
   }
@@ -756,6 +776,7 @@ const fns  = getFunctions(app, FUNCTIONS_REGION);
 const callCreate  = httpsCallable(fns, "createBooking");
 const callVerify  = httpsCallable(fns, "verifyPayment");
 const callRelease = httpsCallable(fns, "releaseBooking");
+const callView    = httpsCallable(fns, "viewTicket");
 
 const $ = (id) => document.getElementById(id);
 const el = {
@@ -1207,6 +1228,14 @@ function paintTicketMap(mine) {
   });
 }
 
+/* The QR payload: a link that reopens this ticket on this page, so any phone
+   that scans it sees the live booking. Off http(s), such as a file preview,
+   it falls back to the bare reference. */
+function ticketLink(id) {
+  if (!id || !/^https?:$/.test(location.protocol)) return null;
+  return location.origin + location.pathname + "?ticket=" + encodeURIComponent(id);
+}
+
 /* QRious draws the code. If it fails to load the reference is shown instead,
    which is what the door actually checks against anyway. */
 function paintTicketQr(reference) {
@@ -1305,7 +1334,7 @@ function paintTicket(d) {
   el.tkRef.textContent = d.reference || d.bookingId;
   el.tkAmt.textContent = inr(d.amount);
   paintTicketMap(ids);
-  paintTicketQr(d.reference || d.bookingId);
+  paintTicketQr(ticketLink(d.bookingId) || d.reference || d.bookingId);
   bindTicketFx();
   requestAnimationFrame(fitTicket);
 }
@@ -1702,7 +1731,14 @@ function onConfirmed(d) {
   else { el.dirLink.classList.add("hidden"); }
   banner("");
   renderPhase();
-  history.replaceState({}, "", location.pathname);
+  // The email note is for a fresh booking; a ticket opened from its link
+  // keeps that link in the address bar so it can be shared onward.
+  $("tkMailed").classList.toggle("hidden", !!state.viewOnly);
+  try {
+    history.replaceState({}, "", state.viewOnly && state.booking.bookingId
+      ? location.pathname + "?ticket=" + encodeURIComponent(state.booking.bookingId)
+      : location.pathname);
+  } catch (err) { /* file previews cannot rewrite the address bar */ }
 }
 
 function onUnfulfilled(d) {
@@ -1725,6 +1761,29 @@ async function recoverFromReturn() {
   }
 }
 
+/* Open a ticket from its QR link: read-only, for whoever holds the link.
+   Unlike the payment return path this never touches seats or order state. */
+async function viewFromLink() {
+  const params = new URLSearchParams(location.search);
+  const ticketId = (params.get("ticket") || "").trim();
+  if (!ticketId) return false;
+  banner("Fetching the ticket.", "info");
+  try {
+    const res = await callView({ bookingId: ticketId });
+    const d = res.data || {};
+    if (d.status === "paid" && (d.seats || []).length) {
+      state.viewOnly = true;
+      state.booking = { bookingId: d.bookingId, seats: d.seats, amount: d.amount };
+      onConfirmed(d);
+      return true;
+    }
+    banner("There is no confirmed booking behind that code. If the payment just happened, give it a minute and open the link from the email again.", "warn");
+  } catch (err) {
+    banner("Could not fetch that ticket. " + (err.message || "Please try again."));
+  }
+  return true;
+}
+
 /* -------------------------------------------------------------------------
    10. Start
    ------------------------------------------------------------------------- */
@@ -1742,7 +1801,7 @@ onAuthStateChanged(auth, (user) => {
   state.uid = user.uid;
   watchEvent();
   watchSeats();
-  recoverFromReturn();
+  viewFromLink().then((handled) => { if (!handled) recoverFromReturn(); });
 });
 
 signInAnonymously(auth).catch((err) => {

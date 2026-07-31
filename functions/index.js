@@ -342,6 +342,27 @@ function summarise(bookingId, booking, outcome) {
 }
 
 /* ---------------------------------------------------------------------------
+   viewTicket
+
+   Read-only view behind the QR link on the ticket. Anyone holding the link
+   can see a confirmed booking's seats, reference and amount: nothing
+   personal (that lives in the private subcollection and stays there),
+   nothing listable (the id is an unguessable capability), and no side
+   effects, unlike verifyPayment which can settle or release seats.
+   --------------------------------------------------------------------------- */
+exports.viewTicket = onCall({ cors: true }, async (request) => {
+  if (!request.auth?.uid) throw new HttpsError("unauthenticated", "Please reload the page and try again.");
+  const bookingId = String(request.data?.bookingId || "").trim();
+  if (!bookingId) throw new HttpsError("invalid-argument", "Missing booking.");
+
+  const snap = await db.collection("bookings").doc(bookingId).get();
+  if (!snap.exists) return { bookingId, status: "none" };
+  const booking = snap.data();
+  if (booking.status !== seats.BOOKING_STATUS.PAID) return { bookingId, status: "none" };
+  return summarise(bookingId, booking);
+});
+
+/* ---------------------------------------------------------------------------
    releaseBooking
    --------------------------------------------------------------------------- */
 exports.releaseBooking = onCall({ cors: true }, async (request) => {
@@ -798,7 +819,11 @@ exports.onBookingSettled = onDocumentWritten(
         return;
       }
 
-      const payload = { bookingId, booking, contact, event: eventDoc, reference };
+      const ticketBase = (PUBLIC_BASE_URL.value() || "").replace(/\/+$/, "");
+      const ticketUrl = ticketBase
+        ? ticketBase + (ticketBase.includes("?") ? "&" : "?") + "ticket=" + bookingId
+        : null;
+      const payload = { bookingId, booking, contact, event: eventDoc, reference, ticketUrl };
 
       if (wantsTicket) {
         await mailer.sendTicket(cfg, payload);

@@ -164,15 +164,16 @@ function seatHeadline(seatIds) {
 }
 
 async function sendTicket(cfg, data) {
-  const { booking, contact, event, reference } = data;
+  const { booking, contact, event, reference, ticketUrl } = data;
   const seatIds = (booking.seats || []).slice().sort((a, b) =>
     a.localeCompare(b, undefined, { numeric: true })
   );
   const count = seatIds.length;
 
-  // Just the reference. Nothing scans this into a system, so a phone camera
-  // shows the door person the same code that is on their list.
-  const qrBuffer = await QRCode.toBuffer(reference, {
+  // The QR is the ticket link when the site address is configured, so any
+  // phone that scans it opens this booking live on the booking page. With no
+  // base URL set it falls back to the bare reference.
+  const qrBuffer = await QRCode.toBuffer(ticketUrl || reference, {
     width: 460, margin: 1, color: { dark: "#07080A", light: "#F2F4F6" }
   });
 
@@ -292,6 +293,7 @@ async function sendTicket(cfg, data) {
                  style="display:block;margin:0 auto;width:124px;height:124px;border:10px solid #F2F4F6;border-radius:12px;background:#F2F4F6">
           </div>
           <div style="margin-top:12px;font:400 10px/1.55 ${SANS};color:${TK_MUTE}">Scan at the door.<br>Carry a government ID.</div>
+          ${ticketUrl ? `<div style="margin-top:8px;font:400 10px/1.4 ${SANS}"><a href="${ticketUrl}" style="color:${TK_SKY};text-decoration:none">View your ticket online</a></div>` : ""}
 
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:24px">
             <tr><td align="center" style="border-top:1px solid rgba(255,255,255,0.09);padding-top:15px">
@@ -329,6 +331,7 @@ async function sendTicket(cfg, data) {
       `Seat${count === 1 ? "" : "s"}: ${seatIds.join(", ")}`,
       `Contribution: ${inr(booking.amount)}`,
       ``,
+      ...(ticketUrl ? [`View your ticket any time: ${ticketUrl}`, ``] : []),
       `Show this reference at the door. Please arrive fifteen minutes early and carry a valid Indian government ID.`
     ].join("\n"),
     html,
